@@ -21,7 +21,7 @@ function createBulkString(value: string | undefined): string {
 }
 
 type StoreItem<T> = {
-  expired: Date | undefined;
+  expires: Date | undefined;
   data: T;
 }
 
@@ -60,12 +60,12 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       }
       store[key] = {
         data: result[2],
-        expired,
+        expires: expired,
       };
 
     } else if (command === "GET") {
       const value = store[result[1]];
-      if(value.expired && value.expired > new Date()) {
+      if(!value.expires || (value.expires > new Date())) {
         connection.write(createBulkString(value.data));
       } else {
         connection.write(createBulkString(undefined));
