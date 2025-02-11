@@ -11,9 +11,23 @@ function escapeNewLines(input: string): string | undefined {
   return input.replace(/\n/g, "\\n").replace(/\r/g, "\\r");
 }
 
+function createBulkString(value: string | undefined): string {
+  if (value === undefined) {
+    return `$-1\r\n`;
+  }
+
+  const len = value.length;
+  return `*${len}\r\n$${len}\r\n${value}\r\n`;
+}
+
+type Store<T> = {
+  [key: string]: T;
+}
 // Uncomment this block to pass the first stage
 const server: net.Server = net.createServer((connection: net.Socket) => {
   const sessionId = Math.random().toString(36);
+  const store: Store<string> = {};
+
   console.log(`somebody connected`);
   connection.on("data", (data: Uint8Array) => {
     const input = Buffer.from(data).toString("utf-8");
@@ -28,8 +42,10 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       connection.write(`+PONG\r\n`)
     } else if(command === "SET") {
       connection.write(`+OK\r\n`)
+      store[result[1]] = result[2];
     } else if (command === "GET") {
-      connection.write(`+OK\r\n`)
+      const value = store[result[1]];
+      connection.write(createBulkString(value))
     } else {
       connection.write(`-ERR unknown command\r\n`);
     }
