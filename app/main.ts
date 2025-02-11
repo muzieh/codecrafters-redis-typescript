@@ -5,7 +5,7 @@ console.log("Logs from your program will appear here!");
 
 // Uncomment this block to pass the first stage
 const server: net.Server = net.createServer((connection: net.Socket) => {
-  console.log('somebody connected');
+  console.log('somebody connected ');
   connection.write("+PONG\r\n");
   // Handle connection
 });
