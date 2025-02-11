@@ -21,10 +21,17 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
 
     log(`SESSION: ${sessionId}`);
     const result = inputParser(input);
-    if(result[0] === "ECHO") {
+    const command = result[0];
+    if(command === "ECHO") {
       connection.write(`+${result[1]}\r\n`);
+    } else if(command === "PING") {
+      connection.write(`+PONG\r\n`)
+    } else if(command === "SET") {
+      connection.write(`+OK\r\n`)
+    } else if (command === "GET") {
+      connection.write(`+OK\r\n`)
     } else {
-      connection.write(`+PONG\r\n`);
+      connection.write(`-ERR unknown command\r\n`);
     }
   })
 });
