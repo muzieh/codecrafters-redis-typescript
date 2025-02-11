@@ -17,7 +17,7 @@ function createBulkString(value: string | undefined): string {
   }
 
   const len = value.length;
-  return `*${len}\r\n$${len}\r\n${value}\r\n`;
+  return `$${len}\r\n${value}\r\n`;
 }
 
 type Store<T> = {
