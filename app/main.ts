@@ -20,13 +20,21 @@ function createBulkString(value: string | undefined): string {
   return `$${len}\r\n${value}\r\n`;
 }
 
-type Store<T> = {
-  [key: string]: T;
+type StoreItem<T> = {
+  expired: Date | undefined;
+  data: T;
 }
+
+type Store<T> = {
+  [key: string]: StoreItem<T>;
+}
+
+
+const store: Store<string> = {};
+
 // Uncomment this block to pass the first stage
 const server: net.Server = net.createServer((connection: net.Socket) => {
   const sessionId = Math.random().toString(36);
-  const store: Store<string> = {};
 
   console.log(`somebody connected`);
   connection.on("data", (data: Uint8Array) => {
@@ -35,17 +43,33 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
 
     log(`SESSION: ${sessionId}`);
     const result = inputParser(input);
-    const command = result[0];
+    const command = result[0].toUpperCase();
+    log(`COMMAND: ${command}`);
     if(command === "ECHO") {
+      log(`${result[1]}`);
       connection.write(`+${result[1]}\r\n`);
     } else if(command === "PING") {
       connection.write(`+PONG\r\n`)
     } else if(command === "SET") {
       connection.write(`+OK\r\n`)
-      store[result[1]] = result[2];
+      const key = result[1];
+      const data = result[2];
+      let expired: Date | undefined = undefined;
+      if(result[3] && result[3] === 'px') {
+        expired = new Date(Date.now() + parseInt(result[4], 10));
+      }
+      store[key] = {
+        data: result[2],
+        expired,
+      };
+
     } else if (command === "GET") {
       const value = store[result[1]];
-      connection.write(createBulkString(value))
+      if(value.expired && value.expired > new Date()) {
+        connection.write(createBulkString(value.data));
+      } else {
+        connection.write(createBulkString(undefined));
+      }
     } else {
       connection.write(`-ERR unknown command\r\n`);
     }
