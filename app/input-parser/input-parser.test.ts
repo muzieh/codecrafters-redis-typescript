@@ -19,5 +19,17 @@ describe('inputParser', () => {
     expect(inputParser('*2\r\n$3\r\nGET\r\n$3\r\nfoo\r\n')).toEqual(['GET', 'foo']);
   })
 
+  test('GET', () => {
+    expect(inputParser('*2\r\n$3\r\nGET\r\n$3\r\nfoo\r\n')).toEqual(['GET', 'foo']);
+  })
+
+  test('CONFIG GET dir', () => {
+    expect(inputParser('*3\r\n$6\r\nCONFIG\r\n$3\r\nGET\r\n$3\r\ndir\r\n')).toEqual(['CONFIG', 'GET', 'dir']);
+  })
+
+  test('CONFIG GET dbfilenam', () => {
+    expect(inputParser('*3\r\n$6\r\nCONFIG\r\n$3\r\nGET\r\n$10\r\ndbfilename\r\n')).toEqual(['CONFIG', 'GET', 'dbfilename']);
+  })
+
 })
 

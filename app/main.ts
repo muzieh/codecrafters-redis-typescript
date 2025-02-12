@@ -3,9 +3,36 @@ import { inputParser } from "./input-parser";
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
+console.log(process.argv);
 function log(s: string) {
   process.stdout.write(`log: ${s}\n`);
 }
+
+type Params = {
+  [key: string]: string;
+}
+
+
+function getParams(argv: string[]): Params  {
+  if (!argv || argv.length == 0) {
+    return {};
+  }
+
+  return argv.reduce((p: Params, c, i, arr) => {
+    if (c.startsWith("--")) {
+      const key = c.slice(2);
+      const value = arr[i + 1];
+      if (value && !value.startsWith("--")) {
+        p[key] = value;
+      }
+    }
+    return p;
+  }, {} as Params);
+
+}
+
+const params = getParams(process.argv);
+console.log(params)
 
 function escapeNewLines(input: string): string | undefined {
   return input.replace(/\n/g, "\\n").replace(/\r/g, "\\r");
@@ -18,6 +45,10 @@ function createBulkString(value: string | undefined): string {
 
   const len = value.length;
   return `$${len}\r\n${value}\r\n`;
+}
+
+function createArray(items: string[]): string {
+  return `*${items.length}\r\n${items.map(createBulkString).join("")}`;
 }
 
 type StoreItem<T> = {
@@ -62,7 +93,6 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         data: result[2],
         expires: expired,
       };
-
     } else if (command === "GET") {
       const value = store[result[1]];
       if(!value.expires || (value.expires > new Date())) {
@@ -70,7 +100,19 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       } else {
         connection.write(createBulkString(undefined));
       }
-    } else {
+    } else if(command === "CONFIG") {
+      const subcommand = result[1].toUpperCase();
+      if(subcommand === "GET") {
+        if(result[2] === "dir") {
+          connection.write(createArray(["dir", params.dir]));
+        } else if(result[2] === "dbfilename") {
+          connection.write(createArray(["dbfilename", params.dbfilename]));
+        } else {
+          connection.write(`-ERR unknown option\r\n`);
+        }
+      }
+    }
+    else {
       connection.write(`-ERR unknown command\r\n`);
     }
   })
