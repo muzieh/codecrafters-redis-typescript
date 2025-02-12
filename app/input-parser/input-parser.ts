@@ -17,7 +17,6 @@ export const inputParser = (input: string): string[] => {
   return [];
 }
 
-
 const parseLength = (input: string, idx: number): LengthAndIndex  => {
   let len = 0;
   do {
@@ -57,36 +56,3 @@ const getArrayItems = (input: string, idx: number, count: number): string[] => {
 
   return results;
 }
-
-/*
-const str1 = "*1\r\n$4\r\nPING\r\n";
-const str = "*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n";
-
-let i = 0;
-let t = str[i++];
-
-switch(t) {
-  case '*':
-    const [arrayItemsCount, idx] = parseLength(str, i);
-    console.log(arrayItemsCount, idx);
-    const resp: string[] = getArrayItems(str, idx, arrayItemsCount);
-    resp;
-    break;
-  case '$':
-    console.log('bulk string');
-    break;
-  default:
-    console.log('unknown');
-    break;
-}
-if(t === '*') console.log('array');
-if(t === '$') console.log('bulk string')
-
-const [len, idx] = parseLength(str, i);
-
-console.log(len)
-console.log(str[idx]);
-
- */
-
-

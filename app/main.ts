@@ -1,6 +1,12 @@
 import * as net from "net";
 import { inputParser } from "./input-parser";
-
+import {
+  getCommand,
+  pingCommand,
+  setCommand,
+  echoCommand,
+  configGetCommand ,
+} from "./commands";
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 console.log(process.argv);
@@ -8,7 +14,7 @@ function log(s: string) {
   process.stdout.write(`log: ${s}\n`);
 }
 
-type Params = {
+export type Params = {
   [key: string]: string;
 }
 
@@ -38,28 +44,14 @@ function escapeNewLines(input: string): string | undefined {
   return input.replace(/\n/g, "\\n").replace(/\r/g, "\\r");
 }
 
-function createBulkString(value: string | undefined): string {
-  if (value === undefined) {
-    return `$-1\r\n`;
-  }
-
-  const len = value.length;
-  return `$${len}\r\n${value}\r\n`;
-}
-
-function createArray(items: string[]): string {
-  return `*${items.length}\r\n${items.map(createBulkString).join("")}`;
-}
-
 type StoreItem<T> = {
   expires: Date | undefined;
   data: T;
 }
 
-type Store<T> = {
+export type Store<T> = {
   [key: string]: StoreItem<T>;
 }
-
 
 const store: Store<string> = {};
 
@@ -73,44 +65,20 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
     log(`DATA: ${escapeNewLines(input)}`);
 
     log(`SESSION: ${sessionId}`);
-    const result = inputParser(input);
-    const command = result[0].toUpperCase();
+    const inputTokens = inputParser(input);
+    const command = inputTokens[0].toUpperCase();
     log(`COMMAND: ${command}`);
+
     if(command === "ECHO") {
-      log(`${result[1]}`);
-      connection.write(`+${result[1]}\r\n`);
+      connection.write(echoCommand(inputTokens));
     } else if(command === "PING") {
-      connection.write(`+PONG\r\n`)
+      connection.write(pingCommand())
     } else if(command === "SET") {
-      connection.write(`+OK\r\n`)
-      const key = result[1];
-      const data = result[2];
-      let expired: Date | undefined = undefined;
-      if(result[3] && result[3] === 'px') {
-        expired = new Date(Date.now() + parseInt(result[4], 10));
-      }
-      store[key] = {
-        data: result[2],
-        expires: expired,
-      };
+      connection.write(setCommand(inputTokens, store));
     } else if (command === "GET") {
-      const value = store[result[1]];
-      if(!value.expires || (value.expires > new Date())) {
-        connection.write(createBulkString(value.data));
-      } else {
-        connection.write(createBulkString(undefined));
-      }
+      connection.write(getCommand(inputTokens, store));
     } else if(command === "CONFIG") {
-      const subcommand = result[1].toUpperCase();
-      if(subcommand === "GET") {
-        if(result[2] === "dir") {
-          connection.write(createArray(["dir", params.dir]));
-        } else if(result[2] === "dbfilename") {
-          connection.write(createArray(["dbfilename", params.dbfilename]));
-        } else {
-          connection.write(`-ERR unknown option\r\n`);
-        }
-      }
+      connection.write(configGetCommand(inputTokens, params))
     }
     else {
       connection.write(`-ERR unknown command\r\n`);
