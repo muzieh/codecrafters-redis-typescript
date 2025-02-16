@@ -178,6 +178,7 @@ export async function readFromFile(fpath: string, store: Store<string>): Promise
           break;
         case RDB_OP_CODE_RESIZEDB:
           console.log('RESIZEDB opcode');
+
           console.log(readInt(chunk, i+1, 1));
           console.log(readInt(chunk, i+2, 1));
           i += 3;
