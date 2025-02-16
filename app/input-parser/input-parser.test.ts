@@ -31,5 +31,9 @@ describe('inputParser', () => {
     expect(inputParser('*3\r\n$6\r\nCONFIG\r\n$3\r\nGET\r\n$10\r\ndbfilename\r\n')).toEqual(['CONFIG', 'GET', 'dbfilename']);
   })
 
+  test('KEYS', () => {
+    expect(inputParser('*1\r\n$4\r\nKEYS\r\n')).toEqual(['KEYS']);
+  })
+
 })
 

@@ -7,9 +7,11 @@ import {
   echoCommand,
   configGetCommand ,
 } from "./commands";
-// You can use print statements as follows for debugging, they'll be visible when running tests.
-console.log("Logs from your program will appear here!");
-console.log(process.argv);
+import * as path from "node:path";
+import * as fs from "node:fs";
+import { readFromFile } from "./store";
+import { keysCommand } from "./commands/keys.ts";
+
 function log(s: string) {
   process.stdout.write(`log: ${s}\n`);
 }
@@ -38,7 +40,7 @@ function getParams(argv: string[]): Params  {
 }
 
 const params = getParams(process.argv);
-console.log(params)
+console.log('Params ' + params)
 
 function escapeNewLines(input: string): string | undefined {
   return input.replace(/\n/g, "\\n").replace(/\r/g, "\\r");
@@ -54,6 +56,7 @@ export type Store<T> = {
 }
 
 const store: Store<string> = {};
+
 
 // Uncomment this block to pass the first stage
 const server: net.Server = net.createServer((connection: net.Socket) => {
@@ -79,6 +82,8 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       connection.write(getCommand(inputTokens, store));
     } else if(command === "CONFIG") {
       connection.write(configGetCommand(inputTokens, params))
+    } else if(command === "KEYS") {
+      connection.write(keysCommand(inputTokens, store));
     }
     else {
       connection.write(`-ERR unknown command\r\n`);
@@ -86,5 +91,17 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
   })
 });
 
-server.listen(6379, "127.0.0.1");
+async function start() {
+  console.log('..starting');
+  if(params.dir && params.dbfilename) {
+    const dbFilePath = path.join(params.dir, params.dbfilename);
+    console.log(`...reading db from: ${dbFilePath}`);
+    await readFromFile(dbFilePath, store);
+  }
+  server.listen(6379, "127.0.0.1");
+}
+
+
+await start();
+
 
