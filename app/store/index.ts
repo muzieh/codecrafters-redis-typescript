@@ -16,6 +16,7 @@ const RDB_OP_CODE_EXP = 0xFD;
 const RDB_OP_CODE_SELECTDB = 0xFE;
 const RDB_OP_CODE_END = 0xFF;
 
+
 //2 most significant bits
 const RDB_LENGTH_6BIT =   0;
 const RDB_LENGTH_14BIT =  1;
