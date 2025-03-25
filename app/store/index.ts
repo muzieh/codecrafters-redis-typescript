@@ -195,7 +195,7 @@ export async function readFromFile(fpath: string, store: Store<string>): Promise
       let expDate: Date | undefined = undefined;
       const [key, value, exp_ms, exp_sec, idx3] = readKey(chunk, i);
       if(exp_ms) {
-        expDate = new Date(exp_ms as unknown as number);
+        expDate = new Date(exp_ms);
       }
       i = idx3;
       store[key] = {
