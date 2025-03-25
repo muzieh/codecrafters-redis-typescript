@@ -192,7 +192,11 @@ export async function readFromFile(fpath: string, store: Store<string>): Promise
 
     console.log(`end of header ${endOfHeader}`);
     while(chunk[i] !== RDB_OP_CODE_END) {
+      let expDate: Date | undefined = undefined;
       const [key, value, exp_ms, exp_sec, idx3] = readKey(chunk, i);
+      if(exp_ms) {
+        expDate = new Date(exp_ms as unknown as number);
+      }
       i = idx3;
       store[key] = {
         data: value,
