@@ -203,7 +203,6 @@ export async function readFromFile(fpath: string, store: Store<string>): Promise
         expires: expDate,
       };
       console.log([key, value, exp_ms, exp_sec]);
-
     }
   })
 
