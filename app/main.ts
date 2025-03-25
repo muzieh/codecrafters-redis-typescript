@@ -8,7 +8,6 @@ import {
   configGetCommand ,
 } from "./commands";
 import * as path from "node:path";
-import * as fs from "node:fs";
 import { readFromFile } from "./store";
 import { keysCommand } from "./commands/keys.ts";
 
