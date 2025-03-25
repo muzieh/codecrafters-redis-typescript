@@ -200,7 +200,7 @@ export async function readFromFile(fpath: string, store: Store<string>): Promise
       i = idx3;
       store[key] = {
         data: value,
-        expires: undefined
+        expires: expDate,
       };
       console.log([key, value, exp_ms, exp_sec]);
 
