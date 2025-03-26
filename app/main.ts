@@ -83,7 +83,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
     } else if(command === "KEYS") {
       connection.write(keysCommand(inputTokens, store));
     } else if(command === "INFO") {
-      connection.write(infoCommand(inputTokens));
+      connection.write(infoCommand(inputTokens, params));
     }
     else {
       connection.write(`-ERR unknown command\r\n`);

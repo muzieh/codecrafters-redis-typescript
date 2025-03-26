@@ -1,9 +1,12 @@
 import { createBulkString } from "../input-parser";
+import type { Params } from "../main.ts";
 
-export function infoCommand(result: string[]): string {
+export function infoCommand(result: string[], params: Params): string {
   const subcommand = result[1].toUpperCase();
+  const role = params && params.replicaof ? "slave" : "master"
+
   const responseParts = [
-    "role:master",
+    `role:${role}`,
     "connected_slaves:0",
     "master_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb",
     "master_repl_offset:0",
