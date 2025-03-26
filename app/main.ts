@@ -10,6 +10,7 @@ import {
 import * as path from "node:path";
 import { readFromFile } from "./store";
 import { keysCommand } from "./commands/keys.ts";
+import { randomBytes } from "crypto";
 
 function log(s: string) {
   process.stdout.write(`log: ${s}\n`);
@@ -34,10 +35,10 @@ function getParams(argv: string[]): Params  {
     }
     return p;
   }, {} as Params);
-
 }
 
 const params = getParams(process.argv);
+params.master_replid = randomBytes(20).toString("hex");
 console.log('Params ' + JSON.stringify(params))
 
 function escapeNewLines(input: string): string | undefined {

@@ -8,7 +8,7 @@ export function infoCommand(result: string[], params: Params): string {
   const responseParts = [
     `role:${role}`,
     "connected_slaves:0",
-    "master_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb",
+    `master_replid:${params.master_replid}"`,
     "master_repl_offset:0",
     "second_repl_offset:-1",
     "repl_backlog_active:0",
