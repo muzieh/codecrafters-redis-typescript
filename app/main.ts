@@ -82,6 +82,8 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       connection.write(configGetCommand(inputTokens, params))
     } else if(command === "KEYS") {
       connection.write(keysCommand(inputTokens, store));
+    } else if(command === "REPLICATION") {
+      connection.write(`+OK replication starting\r\n`);
     }
     else {
       connection.write(`-ERR unknown command\r\n`);
