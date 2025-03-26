@@ -5,7 +5,7 @@ import {
   pingCommand,
   setCommand,
   echoCommand,
-  configGetCommand ,
+  configGetCommand, infoCommand,
 } from "./commands";
 import * as path from "node:path";
 import { readFromFile } from "./store";
