@@ -19,7 +19,6 @@ export type Params = {
   [key: string]: string;
 }
 
-
 function getParams(argv: string[]): Params  {
   if (!argv || argv.length == 0) {
     return {};
@@ -39,7 +38,7 @@ function getParams(argv: string[]): Params  {
 }
 
 const params = getParams(process.argv);
-console.log('Params ' + params)
+console.log('Params ' + JSON.stringify(params))
 
 function escapeNewLines(input: string): string | undefined {
   return input.replace(/\n/g, "\\n").replace(/\r/g, "\\r");
@@ -97,7 +96,9 @@ async function start() {
     console.log(`...reading db from: ${dbFilePath}`);
     await readFromFile(dbFilePath, store);
   }
-  server.listen(6379, "127.0.0.1");
+  let port = (params && params.port) ? parseInt(params.port) : 6379;
+  console.log(`...listening on port ${port}`);
+  server.listen(port, "127.0.0.1");
 }
 
 
