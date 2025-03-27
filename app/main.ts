@@ -5,13 +5,15 @@ import {
   pingCommand,
   setCommand,
   echoCommand,
-  configGetCommand, infoCommand,
+  configGetCommand, infoCommand, replconfCommand,
 } from "./commands";
 import * as path from "node:path";
 import { readFromFile } from "./store";
 import { keysCommand } from "./commands/keys.ts";
 import { randomBytes } from "crypto";
 import { handshake } from "./handshake.ts";
+
+
 
 function log(s: string) {
   process.stdout.write(`log: ${s}\n`);
@@ -46,7 +48,7 @@ if(params.replicaof) {
   const parts = params.replicaof.split(" ");
   const masterHost = parts[0];
   const masterPort = parseInt(parts[1]);
-  handshake(masterHost, masterPort);
+  handshake(masterHost, masterPort, params);
 }
 
 function escapeNewLines(input: string): string | undefined {
@@ -93,6 +95,8 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       connection.write(keysCommand(inputTokens, store));
     } else if(command === "INFO") {
       connection.write(infoCommand(inputTokens, params));
+    } else if(command === "REPLCONF") {
+      connection.write(replconfCommand(inputTokens));
     }
     else {
       connection.write(`-ERR unknown command\r\n`);
