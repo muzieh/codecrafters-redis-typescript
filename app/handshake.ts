@@ -34,6 +34,13 @@ export function handshake(host : string, port: number, params: Params): void {
       step = 4;
       client.write(repl2)
       return;
+    } else if(step === 4 && response.includes('FULLRESYNC')) {
+      console.log(`REPLICA prepares for full resync`);
+      step = 5;
+      return;
+    } if(step === 6) { //waitign for rdb file
+      console.log(`Replica got this content: ${data.toString()}` )
+
     } else {
       client.end();
     }

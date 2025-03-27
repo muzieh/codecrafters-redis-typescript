@@ -99,6 +99,12 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       connection.write(replconfCommand(inputTokens));
     } else if(command === "PSYNC") {
       connection.write(psyncCommand(inputTokens));
+      const contents = 'UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==';
+      const buffer = Buffer.from(contents, 'base64');
+      const hex = Buffer
+      const msg = `$${buffer.length}\r\n`;
+      connection.write(msg);
+      connection.write(buffer);
     }
     else {
       connection.write(`-ERR unknown command\r\n`);
