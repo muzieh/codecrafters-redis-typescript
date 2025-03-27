@@ -11,6 +11,7 @@ import * as path from "node:path";
 import { readFromFile } from "./store";
 import { keysCommand } from "./commands/keys.ts";
 import { randomBytes } from "crypto";
+import { handshake } from "./handshake.ts";
 
 function log(s: string) {
   process.stdout.write(`log: ${s}\n`);
@@ -38,8 +39,15 @@ function getParams(argv: string[]): Params  {
 }
 
 const params = getParams(process.argv);
+console.log(JSON.stringify(params, null, 2));
 params.master_replid = randomBytes(20).toString("hex");
-console.log('Params ' + JSON.stringify(params))
+
+if(params.replicaof) {
+  const parts = params.replicaof.split(" ");
+  const masterHost = parts[0];
+  const masterPort = parseInt(parts[1]);
+  handshake(masterHost, masterPort);
+}
 
 function escapeNewLines(input: string): string | undefined {
   return input.replace(/\n/g, "\\n").replace(/\r/g, "\\r");
