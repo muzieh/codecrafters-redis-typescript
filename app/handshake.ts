@@ -28,6 +28,12 @@ export function handshake(host : string, port: number, params: Params): void {
       step = 3;
       client.write(repl2)
       return;
+    } else if(step === 3 && response === "+OK\r\n") {
+      const repl2 = createArray(["PSYNC", "?", "-1"]);
+      console.log(`Sending to Master: ${repl2} \n`);
+      step = 4;
+      client.write(repl2)
+      return;
     } else {
       client.end();
     }

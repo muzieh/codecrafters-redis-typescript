@@ -5,7 +5,7 @@ import {
   pingCommand,
   setCommand,
   echoCommand,
-  configGetCommand, infoCommand, replconfCommand,
+  configGetCommand, infoCommand, replconfCommand, psyncCommand,
 } from "./commands";
 import * as path from "node:path";
 import { readFromFile } from "./store";
@@ -97,6 +97,8 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
       connection.write(infoCommand(inputTokens, params));
     } else if(command === "REPLCONF") {
       connection.write(replconfCommand(inputTokens));
+    } else if(command === "PSYNC") {
+      connection.write(psyncCommand(inputTokens));
     }
     else {
       connection.write(`-ERR unknown command\r\n`);
